@@ -14579,7 +14579,10 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Computational-Experiment">Computational Experiment<a class="anchor-link" href="#Computational-Experiment">&#182;</a></h1>
+<h1 id="Computational-Experiment-5:-N-Body-Simulations">Computational Experiment 5: N-Body Simulations<a class="anchor-link" href="#Computational-Experiment-5:-N-Body-Simulations">&#182;</a></h1><p>In this experiment, you will run N-body simulations of a variety of systems to see how they evolve.</p>
+<p>Before you begin, <strong>make sure to read through the full notebook and understand what each function does</strong>. Pay special attention to anything that has a <strong>FIXME</strong> note, which you will need to edit.</p>
+<p>In this notebook, we will be making movies but saving them as external .mp4 files instead of embedding them in the notebook.</p>
+
 </div>
 </div>
 </div>
@@ -14626,7 +14629,561 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="1.-Plummer-sphere">1. Plummer sphere<a class="anchor-link" href="#1.-Plummer-sphere">&#182;</a></h2><p>Let's set up a system with lots of particles! The simplest system we can imagine is the ergodic Plummer sphere we derived in class.</p>
+<h2 id="1.-Earth-Sun-System">1. Earth-Sun System<a class="anchor-link" href="#1.-Earth-Sun-System">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We will begin with a simple $N=2$ system so you can see how the package works: the Earth orbiting the Sun. First we need to set up the initial conditions (ICs) of the simulation: the Sun will be at the origin, and the Earth will be 1 au away on a circular orbit.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Sun at origin with zero velocity and mass 1 Msun</span>
+<span class="n">Sun</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">AU</span><span class="p">,</span>
+       <span class="s1">&#39;vel&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span>
+       <span class="s1">&#39;mass&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Msun</span><span class="p">}</span>
+<span class="c1"># Earth is at x=1 au, v_y=29.8 km/s and mass 1 Mearth</span>
+<span class="n">Earth</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">AU</span><span class="p">,</span>
+         <span class="s1">&#39;vel&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">29.8</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span>
+         <span class="s1">&#39;mass&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Mearth</span><span class="p">}</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>To set up a simulation, we need to give two important parameters:</p>
+<ol>
+<li>Time step $dt$, which defines how long between simulation steps.</li>
+<li>The softening length $\epsilon$, which ensures that the force doesn't diverge when particles get too close. This is important when the particles represent samples of a smooth density field, as we'll get to later, but in this case each particle really represents a distinct object, so we don't want any softening and should set this to a very small number (for numerical reasons it's best if this isn't literally zero).</li>
+</ol>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up a Simulation with a time step of 1/20th of a year, a very small softening</span>
+<span class="n">sim</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.05</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.001</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>And then we add the two bodies to the ICs.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sim</span><span class="o">.</span><span class="n">add_IC</span><span class="p">(</span><span class="n">Sun</span><span class="p">)</span>
+<span class="n">sim</span><span class="o">.</span><span class="n">add_IC</span><span class="p">(</span><span class="n">Earth</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Finally we run the simulation for 21 time steps. Each step is 1/20th of a year, so this will give us one full Earth orbit.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sim</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>After running, you can access the full position and velocity history using <code>sim.positions</code> and <code>sim.velocities</code>. Each of these is a (Nsnap, Np, 3) array: the first dimension refers to the snapshot number, the second dimension refers to the particle number, and the third dimension refers to the coordinate (0=x, 1=y, 2=z). You can put specific numbers in for each of these, or use <code>:</code> to get them all.</p>
+<p>For example, if you want to find the y velocities of all particles at snapshot number 5:</p>
+
+<pre><code>sim.velocities[5,:,1]</code></pre>
+<p>or if you wanted to know the 3D position of particle number 0 at the end (remember that you can use <code>-1</code> to get the last element):</p>
+
+<pre><code>sim.positions[-1,0,:]</code></pre>
+<p>or if you wanted to know the x positions of particle number 25 at all snapshots:</p>
+
+<pre><code>sim.positions[:,25,0]</code></pre>
+<p>So the following code will plot the x-y positions of each body over all snapshots.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Make a plot that has an aspect ratio of 1, i.e. it will be square if the axes have the same size.</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="c1"># Plot x vs. y of particle 0 (Sun) in units of AU (default is kpc, which will look very strange!)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">)</span>
+<span class="c1"># Plot x vs. y of particle 1 (Earth) as above</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x (au)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y (au)&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Look at it! Does it look like you'd expect?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Let's check out the Sun's velocity in one dimension, say $x$. You can access the time of each simulation snapshot using <code>sim.times</code>.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Plot Sun&#39;s reflex motion vs. time (in years)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">),</span> <span class="n">sim</span><span class="o">.</span><span class="n">velocities</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;t (yr)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$v_x$ (m/s)&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>What do you think about this?</p>
+<p><strong>FIXME:</strong> Try changing the mass of the Earth. You will need to recreate the Simulation object each time -- there is a <code>sim.reset()</code> function, which will wipe out the run but it will leave the ICs and any external forces (see later), so if you want to completely change the ICs it's easiest to just create a new Simulation object by going back to the <code>sim = Simulation(...</code> line.</p>
+<p>The first exoplanet-detecting spectrographs had a spectral resolution equivalent to 1 m/s. How massive does the Earth-like planet need to be to be detectable with those instruments around a nearby star, i.e. to cause a reflex motion of 1 m/s? Do you get the same answer from analytic arguments?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p><strong>FIXME</strong>: Reset the mass of the Earth, but change the timestep <code>dt</code> and run the simulation for a few orbits (you will need to adjust the number of steps to be appropriate). What happens when <code>dt</code> is small? What happens when <code>dt</code> is large? How large can you make it before it starts messing up the orbit? Why?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="2.-Effects-of-orbital-eccentricity">2. Effects of orbital eccentricity<a class="anchor-link" href="#2.-Effects-of-orbital-eccentricity">&#182;</a></h2><p>Let's try to make this a bit more realistic. You can use <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/">this list of planetary data</a> to look up the masses and orbital properties of some important Solar System bodies.</p>
+<p>It's relatively easy to set up a planet at either aphelion or perihelion using this data: the "Orbital Velocity" and "Distance from Sun" rows are both averages, and conservation of angular momentum tells you that $v \propto 1/r$ throughout the orbit. For example, instead of the Earth shown above, this line will set up the Earth to be at perihelion along the x axis:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Make this the appropriate value in km/s but do not put the astropy unit in -- that will be done below.</span>
+<span class="n">v_Earth_at_peri</span> <span class="o">=</span> <span class="mf">29.8</span> <span class="o">*</span> <span class="mf">149.6</span><span class="o">/</span><span class="mf">147.1</span>
+
+<span class="n">Earth</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pos&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">147.1e6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="p">,</span>
+         <span class="s1">&#39;vel&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_Earth_at_peri</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span>
+         <span class="s1">&#39;mass&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Mearth</span><span class="p">}</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Let's do the simulation again and see if accounting for orbital eccentricity makes a difference.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up a Simulation with a time step of 1/20th of a year, a very small softening</span>
+<span class="n">sim_e</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.05</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.001</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">)</span>
+<span class="n">sim_e</span><span class="o">.</span><span class="n">add_IC</span><span class="p">(</span><span class="n">Sun</span><span class="p">)</span>
+<span class="n">sim_e</span><span class="o">.</span><span class="n">add_IC</span><span class="p">(</span><span class="n">Earth</span><span class="p">)</span>
+<span class="n">sim_e</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Make a plot that has an aspect ratio of 1, i.e. it will be square if the axes have the same size.</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="c1"># Plot x vs. y of particle 0 (Sun) in units of AU</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">)</span>
+<span class="c1"># Plot x vs. y of circular Earth</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Circular&#39;</span><span class="p">)</span>
+<span class="c1"># Plot x vs. y of eccentric Earth</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_e</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim_e</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkcyan&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Eccentric&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x (au)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;y (au)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Plot Sun&#39;s reflex motion vs. time (in years)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">),</span> <span class="n">sim</span><span class="o">.</span><span class="n">velocities</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Circular&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_e</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">),</span> <span class="n">sim_e</span><span class="o">.</span><span class="n">velocities</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkcyan&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Eccentric&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;t (yr)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$v_x$ (m/s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>What do you think about these plots?</p>
+<p><strong>FIXME:</strong> Try changing the orbital eccentricity of the Earth, keeping everything else the same. How eccentric does it need to be to make a measurable difference? How do radial velocity curves for stars with eccentric planets differ?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="3.-Add-more-planets">3. Add more planets<a class="anchor-link" href="#3.-Add-more-planets">&#182;</a></h2><p><strong>FIXME:</strong> Using the orbital data from the NSSDC website, create a simulation that has Venus, Earth, Jupiter, and Saturn. Make sure to choose an appropriate value for both <code>dt</code> that is small enough to accurately integrate the fastest planet, and enough time steps to do at least one full orbit of the slowest planet. Set some of them at perihelion and some at aphelion. Also, don't line them all up on the same axis -- put at least a couple of them at different points in the orbit.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Venus</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+<span class="n">Earth</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+<span class="n">Jupiter</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+<span class="n">Saturn</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sim_SS</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="c1">#FIXME</span>
+<span class="n">sim_SS</span><span class="o">.</span><span class="n">add_IC</span><span class="p">(</span><span class="c1">#FIXME</span>
+<span class="c1">#...more add_IC lines...</span>
+<span class="n">sim_SS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="c1">#FIXME</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Plot the planet orbits.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_SS</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim_SS</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_SS</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">),</span> <span class="n">sim_SS</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">))</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>What do you think?</p>
+<p>We can make a movie of the simulation using the <code>movie_particles()</code> function. It will write the output to an .mp4 file (you need to give it a filename). The other most useful parameters are the unit of the x and y axes, and the x and y limits of the plots that make up the movie. If you want to do a more complicated movie, you can follow the examples later on or look at the GravHopper source code of this function.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The title bar will show a timeline, but by default it is in Myr, which isn&#39;t very useful for this case.</span>
+<span class="c1"># So first let&#39;s change the sim_SS.times array to be in units of years.</span>
+<span class="n">sim_SS</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">sim_SS</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">)</span>
+<span class="c1"># Then make the movie, with axes in units of AU, going out to 12 AU in each direction, and points that are not too small.</span>
+<span class="n">sim_SS</span><span class="o">.</span><span class="n">movie_particles</span><span class="p">(</span><span class="s1">&#39;SS.mp4&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">au</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>What do you think of this movie?</p>
+<p>Now let's look at the Solar reflex motion again.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Plot Sun&#39;s reflex motion vs. time (in years)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_SS</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">yr</span><span class="p">),</span> <span class="n">sim_SS</span><span class="o">.</span><span class="n">velocities</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;t (yr)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$v_x$ (m/s)&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p><strong>FIXME:</strong> Use <code>plt.xlim()</code> and <code>plt.ylim</code> to zoom in on diffent parts of the plot (or you can run this all with <code>%matplotlib notebook</code> so you can zoom in interactively). Can you identify oscillations caused by each of the planets?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="4.-Do-something-interesting">4. Do something interesting<a class="anchor-link" href="#4.-Do-something-interesting">&#182;</a></h2><p>Alter one of the above simulations in some interesting way to explore solar system-type dynamics. For example, you could:</p>
+<ul>
+<li>Add one or more moons.</li>
+<li>Make planets massive enough and/or nearby enough to each other that they interact with each other.</li>
+<li>Throw a planet at the Sun.</li>
+<li>Simulate a real exoplanet system.</li>
+<li>Set up an unstable 3-body system.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="5.-Plummer-sphere">5. Plummer sphere<a class="anchor-link" href="#5.-Plummer-sphere">&#182;</a></h2><p>Now let's set up a system with lots of particles! The simplest system we can imagine is the ergodic Plummer sphere we derived in class.</p>
 
 </div>
 </div>
@@ -14906,7 +15463,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="2.-Play-with-the-Plummer-sphere">2. Play with the Plummer sphere<a class="anchor-link" href="#2.-Play-with-the-Plummer-sphere">&#182;</a></h2><p><strong>FIXME:</strong> Try changing the scale length <code>b</code> of the Plummer sphere (you will probably need to play with the limits of the various axes). How would you expect the velocity dispersion to scale with $b$ based on analytic arguments? How does that compare to what you see?</p>
+<h2 id="6.-Play-with-the-Plummer-sphere">6. Play with the Plummer sphere<a class="anchor-link" href="#6.-Play-with-the-Plummer-sphere">&#182;</a></h2><p><strong>FIXME:</strong> Try changing the scale length <code>b</code> of the Plummer sphere (you will probably need to play with the limits of the various axes). How would you expect the velocity dispersion to scale with $b$ based on analytic arguments? How does that compare to what you see?</p>
 <p><strong>FIXME:</strong> Try changing the total mass of the Plummer sphere. How would you expect the velocity dispersion to scale with mass? How does that compare to what you see?</p>
 
 </div>
@@ -14919,7 +15476,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="3.-Truncated-Singular-Isothermal-Sphere">3. Truncated Singular Isothermal Sphere<a class="anchor-link" href="#3.-Truncated-Singular-Isothermal-Sphere">&#182;</a></h2><p>We investigated the Truncated Singular Isothermal Sphere analytically in Assignment 4 -- now let's examine it numerically!</p>
+<h2 id="7.-Truncated-Singular-Isothermal-Sphere">7. Truncated Singular Isothermal Sphere<a class="anchor-link" href="#7.-Truncated-Singular-Isothermal-Sphere">&#182;</a></h2><p>We investigated the Truncated Singular Isothermal Sphere analytically in Assignment 4 -- now let's examine it numerically!</p>
 
 </div>
 </div>
@@ -15091,13 +15648,551 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="4.-Do-something-interesting">4. Do something interesting<a class="anchor-link" href="#4.-Do-something-interesting">&#182;</a></h2><p>Modify something in one of the spherical examples. For example:</p>
+<h2 id="8.-Do-something-interesting">8. Do something interesting<a class="anchor-link" href="#8.-Do-something-interesting">&#182;</a></h2><p>Modify something in one of the spherical examples. For example:</p>
 <ul>
 <li>Try changing <code>dt</code> significantly. What effect does it have?</li>
 <li>Try changing <code>N</code> significantly. How does it affect what you see? How does it affect how long it takes the simulation to run?</li>
 <li>Try running the simulation for much longer. Do you see any distinct long-term evolution of the system that's different from what happens on shorter timescales?</li>
 <li>Use the Hernquist sphere (you can run <code>help(IC.Hernquist)</code> to find the parameters it takes). How does it behave compared to the other examples?</li>
 <li>Use one of galpy's other spherical distribution functions (see <a href="https://docs.galpy.org/en/latest/reference/df.html">here</a>) and <code>IC.from_galpy_df()</code> to do another IC. Note that the galpy DFs don't play nicely with astropy units, so you will need to convert the units manually.</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="9.-Disk-stability">9. Disk stability<a class="anchor-link" href="#9.-Disk-stability">&#182;</a></h2><p>We will create an exponential disk that is isothermal in the vertical direction, in a background NFW potential, and let it run. Solving for an equilibrium disk configuration is very hard, and so <code>IC.expdisk</code> does an approximate solution.</p>
+<p>First we need to define the analytic NFW potential. This is both used in the simulation, so all particles will feel this extra force in addition to the force from all the other particles, and is also required by the IC code so that it knows what rotation velocities to give the particles.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Galpy NFW potential with a scale mass of 2e11 Msun and scale radius of 20 kpc</span>
+<span class="n">NFWpot</span> <span class="o">=</span> <span class="n">potential</span><span class="o">.</span><span class="n">NFWPotential</span><span class="p">(</span><span class="n">amp</span><span class="o">=</span><span class="mf">2e11</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Msun</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">20</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create an exponential disk with central surface brightness of 100 Msun/pc^2, exponential scale length of 2kpc</span>
+<span class="c1"># and vertical height of 0.2 kpc, a radial velocity dispersion scale of 20 km/s, and</span>
+<span class="c1"># using the NFWpot rotation curve as an external force with 5000 particles</span>
+<span class="n">expdisk_IC</span> <span class="o">=</span> <span class="n">IC</span><span class="o">.</span><span class="n">expdisk</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">sigma0</span><span class="o">=</span><span class="mi">100</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Msun</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">pc</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">Rd</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span><span class="p">,</span> <span class="n">z0</span><span class="o">=</span><span class="mf">0.2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span><span class="p">,</span> <span class="n">sigmaR_Rd</span><span class="o">=</span><span class="mi">20</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span>\
+                       <span class="n">external_rotcurve</span><span class="o">=</span><span class="n">NFWpot</span><span class="o">.</span><span class="n">vcirc</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create a simulation with a 2.5 Myr time step and 0.1 kpc softening</span>
+<span class="n">sim_disk</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">2.5</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">Myr</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span><span class="p">)</span>
+<span class="c1"># Add the disk IC</span>
+<span class="n">sim_disk</span><span class="o">.</span><span class="n">add_IC</span><span class="p">(</span><span class="n">expdisk_IC</span><span class="p">)</span>
+<span class="c1"># Add the NFW potential as an external force</span>
+<span class="n">sim_disk</span><span class="o">.</span><span class="n">add_external_force</span><span class="p">(</span><span class="n">NFWpot</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Run for 400 time steps</span>
+<span class="n">sim_disk</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Let's make a movie of the particle positions and velocities, both face-on and edge-on.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
+
+<span class="c1"># Function that updates each frame</span>
+<span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">ax_xy</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">221</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ax_xz</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">223</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ax_vxy</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">222</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ax_vxz</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="c1"># First plot: particle positions xy in units of kpc</span>
+    <span class="n">plot_xy</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">plot_particles</span><span class="p">(</span><span class="n">snap</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">parm</span><span class="o">=</span><span class="s1">&#39;pos&#39;</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span><span class="p">,</span> \
+                                 <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_xy</span><span class="p">)</span>
+    <span class="c1"># Second plot: velocity in xy in units of km/s</span>
+    <span class="n">plot_vxy</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">plot_particles</span><span class="p">(</span><span class="n">snap</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">parm</span><span class="o">=</span><span class="s1">&#39;vel&#39;</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> \
+                                <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_vxy</span><span class="p">)</span>
+
+    <span class="c1"># Same but xz</span>
+    <span class="n">plot_xz</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">plot_particles</span><span class="p">(</span><span class="n">snap</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">parm</span><span class="o">=</span><span class="s1">&#39;pos&#39;</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;xz&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span><span class="p">,</span> \
+                                 <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_xz</span><span class="p">)</span>
+    <span class="n">plot_vxz</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">plot_particles</span><span class="p">(</span><span class="n">snap</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">parm</span><span class="o">=</span><span class="s1">&#39;vel&#39;</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="s1">&#39;xz&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> \
+                                <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_vxz</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">plot_xy</span><span class="p">,</span> <span class="n">plot_vxy</span><span class="p">,</span> <span class="n">plot_xz</span><span class="p">,</span> <span class="n">plot_vxz</span>
+
+<span class="n">ms_per_frame</span> <span class="o">=</span> <span class="mi">40</span>   <span class="c1"># 25 frames per second</span>
+<span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">animate</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">Nsnap</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">ms_per_frame</span><span class="p">)</span>
+<span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;disk_posvel.mp4&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Think about what you're seeing, both initially and after it settles down. Does it reach a reasonably steady state, or does it continue to evolve?</p>
+<p>Let's look at the evolution of the surface density and vertical density profiles.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+
+<span class="n">plotz_max</span> <span class="o">=</span> <span class="mf">2.</span>
+
+<span class="c1"># Function that updates each frame</span>
+<span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">ax_surfdens</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+    <span class="n">ax_vertdens</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+    
+    <span class="c1"># Create a pynbody snapshot of the given snapshot and make a 3D profile from it</span>
+    <span class="n">snap</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">pyn_snap</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="c1"># Make a 2D profile of the snapshot (so we get surface density as a function of cylindrical radius)</span>
+    <span class="n">prof</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="c1"># Vertical profile that gives us density as a function of height. Use all radii between 0 and 25 kpc.</span>
+    <span class="n">zprof</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">VerticalProfile</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">25.</span><span class="p">,</span> <span class="n">plotz_max</span><span class="p">)</span>
+    
+    <span class="c1"># Surface density profile</span>
+    <span class="n">densplot</span> <span class="o">=</span> <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">])</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1e2</span><span class="p">,</span><span class="mf">1e8</span><span class="p">)</span>
+    <span class="n">radial_label</span> <span class="o">=</span> <span class="s1">&#39;r ($</span><span class="si">{0}</span><span class="s1">$)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">latex</span><span class="p">())</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">radial_label</span><span class="p">)</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;$</span><span class="se">\\</span><span class="s1">Sigma$ ($</span><span class="si">{0}</span><span class="s1">$)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">latex</span><span class="p">()))</span>
+    <span class="n">ax_surfdens</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="n">frame</span><span class="p">]))</span>
+    
+    <span class="c1"># Vertical density profile</span>
+    <span class="n">vertplot</span> <span class="o">=</span> <span class="n">ax_vertdens</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">zprof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">zprof</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">in_units</span><span class="p">(</span><span class="s1">&#39;Msol pc^-3&#39;</span><span class="p">))</span>
+    <span class="n">ax_vertdens</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">ax_vertdens</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">plotz_max</span><span class="p">)</span>
+    <span class="n">ax_vertdens</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">3e-6</span><span class="p">,</span> <span class="mf">3e-3</span><span class="p">)</span>
+    <span class="n">vertical_axis_label</span> <span class="o">=</span> <span class="s1">&#39;z ($</span><span class="si">{0}</span><span class="s1">$)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zprof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">latex</span><span class="p">())</span>
+    <span class="n">ax_vertdens</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">vertical_axis_label</span><span class="p">)</span>
+    <span class="n">ax_vertdens</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;$</span><span class="se">\\</span><span class="s1">rho$ [M$_{\odot}$ pc$^{-3}$]&#39;</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">densplot</span><span class="p">,</span> <span class="n">vertplot</span>
+
+<span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">animate</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">Nsnap</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">ms_per_frame</span><span class="p">)</span>
+<span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;disk_profiles.mp4&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Look at these. How do they connect to how we tried to set up the disk? How do they connect to what you see in the particle movies?</p>
+<p>We can also use profiles to make movies of the 3 velocity components. We'll plot both the mean velocities and the dispersions.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">18</span><span class="p">))</span>
+
+<span class="n">radius_range</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="n">vrange</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span><span class="mi">40</span><span class="p">]</span>
+
+<span class="c1"># Function that updates each frame</span>
+<span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">ax_vr</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">221</span><span class="p">)</span>
+    <span class="n">ax_vphi</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">222</span><span class="p">)</span>
+    <span class="n">ax_vz</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">223</span><span class="p">)</span>
+    
+    <span class="c1"># Create a pynbody snapshot of the given snapshot and make a 3D profile from it</span>
+    <span class="n">snap</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">pyn_snap</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="c1"># Make a 2D profile of the snapshot</span>
+    <span class="n">prof</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">Profile</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">radial_label</span> <span class="o">=</span> <span class="s1">&#39;r ($</span><span class="si">{0}</span><span class="s1">$)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">latex</span><span class="p">())</span>
+
+    <span class="n">vrplot</span> <span class="o">=</span> <span class="n">ax_vr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;vr&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$&lt;v_R&gt;$&#39;</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;vr_disp&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$\sigma_R$&#39;</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_range</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">radius_range</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">vrange</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">radial_label</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Radial Velocity&#39;</span><span class="p">)</span>
+    <span class="n">ax_vr</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+
+    <span class="n">vphiplot</span> <span class="o">=</span> <span class="n">ax_vphi</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;vphi&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$&lt;v_{\phi}&gt;$&#39;</span><span class="p">)</span>
+    <span class="n">ax_vphi</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;vphi_disp&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$\sigma_{\phi}$&#39;</span><span class="p">)</span>
+    <span class="n">ax_vphi</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">radius_range</span><span class="p">)</span>
+    <span class="n">ax_vphi</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># These will be higher</span>
+    <span class="n">ax_vphi</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">radial_label</span><span class="p">)</span>
+    <span class="n">ax_vphi</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Azimuthal Velocity&#39;</span><span class="p">)</span>
+    <span class="n">ax_vphi</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+    
+    <span class="n">vzplot</span> <span class="o">=</span> <span class="n">ax_vz</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;vz&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$&lt;v_z&gt;$&#39;</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s1">&#39;rbins&#39;</span><span class="p">],</span> <span class="n">prof</span><span class="p">[</span><span class="s1">&#39;vz_disp&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$\sigma_z$&#39;</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">radius_range</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">radius_range</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">*</span><span class="n">vrange</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">radial_label</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Vertical Velocity&#39;</span><span class="p">)</span>
+    <span class="n">ax_vz</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">vrplot</span><span class="p">,</span> <span class="n">vphiplot</span><span class="p">,</span> <span class="n">vzplot</span>
+
+<span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">animate</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">Nsnap</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">ms_per_frame</span><span class="p">)</span>
+<span class="n">anim</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;disk_vprofs.mp4&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Think about what you're seeing, both in terms of the mean velocities and their dispersions. How does this relate to how you see the densities evolve?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="10.-Play-with-the-disk">10. Play with the disk<a class="anchor-link" href="#10.-Play-with-the-disk">&#182;</a></h2><p><strong>FIXME:</strong> Take each of the disk parameters and try changing it to see what effect it has. Do the equilibrium configurations (if they exist) reflect these changes in the way you would expect? Do the presence or absence of disk instabilities change in the way you would expect?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="11.-Find-a-particle-and-trace-its-orbit">11. Find a particle and trace its orbit<a class="anchor-link" href="#11.-Find-a-particle-and-trace-its-orbit">&#182;</a></h2><p>Let's find a particle with particular properties and trace its orbit. We'll choose a particle based on its original position and velocity. Pick a position and velocity for a particle that you would expect to be on a mostly (but not perfectly) circular orbit, i.e. one that should have a slight orbital eccentricity in the orbital plane and a slight vertical bobbing.</p>
+<p><strong>FIXME:</strong> Put your preferred particle position and velocity here.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">R_desired</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+<span class="n">z_desired</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+<span class="n">vR_desired</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+<span class="n">vz_desired</span> <span class="o">=</span> <span class="c1">#FIXME</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Compare all particles to this, relative to a &quot;typical&quot; distance and velocity scale</span>
+<span class="n">Rscale</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span>
+<span class="n">zscale</span> <span class="o">=</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">kpc</span>
+<span class="n">vscale</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">km</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span>
+<span class="n">disk_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">disk_z</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">disk_vR</span> <span class="o">=</span> <span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">velocities</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">velocities</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">disk_R</span>
+<span class="n">disk_vz</span> <span class="o">=</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">velocities</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">how_dissimilar</span> <span class="o">=</span> <span class="p">((</span><span class="n">disk_R</span> <span class="o">-</span> <span class="n">R_desired</span><span class="p">)</span><span class="o">/</span><span class="n">Rscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">disk_z</span> <span class="o">-</span> <span class="n">z_desired</span><span class="p">)</span><span class="o">/</span><span class="n">zscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> \
+    <span class="p">((</span><span class="n">disk_vR</span> <span class="o">-</span> <span class="n">vR_desired</span><span class="p">)</span><span class="o">/</span><span class="n">vscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">disk_vz</span> <span class="o">-</span> <span class="n">vz_desired</span><span class="p">)</span><span class="o">/</span><span class="n">vscale</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># np.argmin tells you which element in an array has the smallest value</span>
+<span class="n">best_particle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">how_dissimilar</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p><strong>FIXME:</strong> Check that it did an okay job using this. If not, go back and adjust your desired parameters. You won't find a perfect match, but make sure that it is "mostly but not perfectly circular".</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;R: &#39;</span><span class="p">,</span><span class="n">disk_R</span><span class="p">[</span><span class="n">best_particle</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;z: &#39;</span><span class="p">,</span><span class="n">disk_z</span><span class="p">[</span><span class="n">best_particle</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;vR: &#39;</span><span class="p">,</span><span class="n">disk_vR</span><span class="p">[</span><span class="n">best_particle</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;vz: &#39;</span><span class="p">,</span><span class="n">disk_vz</span><span class="p">[</span><span class="n">best_particle</span><span class="p">])</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Now let's plot this particle's orbit.</p>
+<p><strong>FIXME:</strong> Plot the xy and xz trajectories of <code>best_particle</code>.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># xy and xz projections</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax_xy</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ax_xz</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ax_xy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="c1">#FIXME</span>
+<span class="n">ax_xz</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="c1">#FIXME</span>
+<span class="c1"># Label appropriately</span>
+<span class="n">ax_xy</span><span class="o">.</span><span class="n">set_</span><span class="c1">#FIXME...</span>
+<span class="n">ax_xz</span><span class="o">.</span><span class="n">set_</span><span class="c1">#FIXME...</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>And let's plot how $R$ and $z$ evolve with time.</p>
+<p>Note: You might want to use the <code>%matplotlib notebook</code> pragma to do the analysis of this.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax_R</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">ax_z</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="c1"># Define R of best_particle for convenience</span>
+<span class="n">best_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="n">best_particle</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="n">best_particle</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># time label</span>
+<span class="n">timelabel</span> <span class="o">=</span> <span class="s1">&#39;t (</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">times</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+<span class="n">ax_R</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">best_R</span><span class="p">)</span>
+<span class="n">ax_R</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">timelabel</span><span class="p">)</span>
+<span class="n">ax_R</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;R (</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_R</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+
+<span class="n">ax_z</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="p">[:,</span><span class="n">best_particle</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">ax_z</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">timelabel</span><span class="p">)</span>
+<span class="n">ax_z</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;z (</span><span class="si">{0}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sim_disk</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>How do these orbits compare to the orbits we computed in Experiment 3? What is your best estimate for the epicyclic frequency, based on this plot? How about the vertical frequency? Are they constant? Is there any relation between the vertical frequency and $R$? What would you expect the frequencies to be at early times based on the NFW + disk potential with the surface density profile we gave and the radius you chose? Do they agree with what you measure from the plot?</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="12.-Do-something-interesting">12. Do something interesting<a class="anchor-link" href="#12.-Do-something-interesting">&#182;</a></h2><p>You know the drill... try something else! For example, you could:</p>
+<ul>
+<li>Take some parameters to ridiculous extremes and see whether it reacts how you expect.</li>
+<li>Add an N-body bulge (e.g. as a Hernquist IC).<ul>
+<li>If you do this, make sure to include its effect on the rotation curve when you set up the disk.</li>
+</ul>
+</li>
+<li>Use a different potential for the halo.</li>
+<li>Add a time-dependent potential like a bar (note: if you do this, you will need to use the <code>add_external_timedependent_force</code> instead of <code>add_external_force</code>).</li>
+<li>Run for a very long time to see the long term evolution of the disk.</li>
+<li>Try using a halo potential that is different from the rotation curve used to set up the disk.</li>
 </ul>
 
 </div>

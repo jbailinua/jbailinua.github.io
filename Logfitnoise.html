@@ -14895,7 +14895,7 @@ $ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="What-do-the-terms-look-like?">What do the terms look like?<a class="anchor-link" href="#What-do-the-terms-look-like?">&#182;</a></h2><p>We have an intuition of what the least squares terms look like -- it has a value of 1 for a point where the model deviates from the data by $1\sigma$, and grows as the square beyond that. What does the upper limit term look like?</p>
+<h2 id="What-does-this-term-look-like?">What does this term look like?<a class="anchor-link" href="#What-does-this-term-look-like?">&#182;</a></h2><p>We have an intuition of what the least squares terms look like -- it has a value of 1 for a point where the model deviates from the data by $1\sigma$, and grows as the square beyond that. What does the upper limit term look like?</p>
 <p>The parameter it depends on is $\bar{\psi}_i / \Sigma_i$, which we can think of as "how many sigma detection we would expect". We might intuitively expect that a non-detection would have $\psi_i \approx 0$, so we can also compare the term to what we would get if we simply did a linear fit with that assumption.</p>
 
 </div>
@@ -14942,7 +14942,7 @@ $ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7f7a6bcdf8b0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fdcf22c90a0&gt;</pre>
 </div>
 
 </div>
@@ -15022,7 +15022,7 @@ jp-needs-light-background
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7f7a6c21b040&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fdcf28ffb80&gt;</pre>
 </div>
 
 </div>
@@ -15058,6 +15058,20 @@ jp-needs-light-background
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>The similarity is now more apparent. However, it is clear that when the model ought to be "many sigma detectable" (on the right), this derivation is more sympathetic to there being an upper limit than a linear fit with a measured value of exactly zero would be. This is because the Gaussian drops so dramatically in the tails, and so the difference between $\psi_i=0$ (the only possibility for the linear term) and $\psi_i=\Sigma_i$ (allowed in the upper limit term) is significant.</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Alternative-procedure:-log-when-possible,-linear-when-negative">Alternative procedure: log when possible, linear when negative<a class="anchor-link" href="#Alternative-procedure:-log-when-possible,-linear-when-negative">&#182;</a></h2><p>The upper limit term is a little long to calculate and definitely more painful to treat analytically if that's useful, so another approach might be to use the log fit wherever it's not negative, and do a linear term instead of the upper limit term when it's negative. As we'll see below, this relatively simple modification actually performs great. Formally, it still looks like very much like least squares; we minimize</p>
+$$ \sum_{i\textrm{ where }\psi_i&gt;0} \frac{(y_i - \bar{y}_i)^2}{\sigma_i^2} - \sum_{i\textrm{ where }\psi_i \le 0} \frac{(\psi_i - \bar{\psi}_i)^2}{\Sigma_i^2} $$<p>where again $\{\psi_i\}$, $\{\Sigma_i\}$ are the raw (linear, background-subtracted) values and their uncertainties, and $ \{y_i = \log_{10}(\psi_i)\} $, 
+$ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
 
 </div>
 </div>
@@ -15576,7 +15590,7 @@ Fit: [0.96530206 0.6848794  1.75130682 1.81916897]
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/var/folders/qw/j92fvdd10wd917z4qrt9fwp40000gn/T/ipykernel_79979/2062580544.py:1: RuntimeWarning: invalid value encountered in log10
+<pre>/var/folders/qw/j92fvdd10wd917z4qrt9fwp40000gn/T/ipykernel_86019/2062580544.py:1: RuntimeWarning: invalid value encountered in log10
   valuedata_log = np.log10(valuedata)
 </pre>
 </div>
@@ -15962,8 +15976,7 @@ Fit: [1.06377047 0.69960169 2.08535666 1.89951053]
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Test-4:-Log-where-possible,-linear-when-negative">Test 4: Log where possible, linear when negative<a class="anchor-link" href="#Test-4:-Log-where-possible,-linear-when-negative">&#182;</a></h3><p>The upper limit term is a little long to calculate and definitely more painful to treat analytically if that's useful, so another approach might be to use the log fit wherever it's not negative, and do a linear term instead of the upper limit term when it's negative. Let's try.</p>
-
+<h3 id="Test-4:-Log-where-possible,-linear-when-negative">Test 4: Log where possible, linear when negative<a class="anchor-link" href="#Test-4:-Log-where-possible,-linear-when-negative">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -16236,7 +16249,7 @@ Fit: [1.06377106 0.69960087 1.99338384 1.90490044]
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7f7a6cbcc4c0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7fdcf32fddf0&gt;</pre>
 </div>
 
 </div>
@@ -16264,6 +16277,19 @@ jp-needs-light-background
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Clearly, at least in this case, the last procedure -- using least squares with log values when possible and linear values otherwise -- performs the best, followed by using the upper limit term, while pure linear and pure log least squares are not recommended.</p>
+<p>A more formal analysis would re-do this for many different random seeds, which would better quantify the error and help understand how much is scatter vs. bias, as well as checking how it performs as a function of how many negative values there are. If anyone does this, I would love to hear the results! (jbailin at ua dot edu).</p>
+
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">

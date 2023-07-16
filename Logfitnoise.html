@@ -14644,7 +14644,7 @@ $$ = \sum_i -\frac{(y_i - \bar{y}_i)^2}{2 \sigma_i^2} - \frac{1}{2} \ln(2\pi) - 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>When we do the minimization, the only thing that changes are the model values $\{\bar{y}_i\}$, so the first term is the only one that matters. Maximizing $\ln \mathcal{L}$ is therefore equivalent to minimizing $-\ln \mathcal{L}$ or minimizing the squares of the differences scaled by the uncertainty (since the constant factor of 2 doesn't matter to the minimiziation)
+<p>When we do the maximization, the only thing that changes are the model values $\{\bar{y}_i\}$, so the first term is the only one that matters. Maximizing $\ln \mathcal{L}$ is therefore equivalent to minimizing $-\ln \mathcal{L}$ or minimizing the squares of the differences scaled by the uncertainty (since the constant factor of 2 doesn't matter to the minimiziation)
 $$ \textrm{Minimize} \qquad \frac{(y_i - \bar{y}_i)^2}{\sigma_i^2} $$</p>
 
 </div>
@@ -14877,13 +14877,13 @@ $$ \therefore P_i = \frac{1}{2} \mathrm{erfc} \left(\frac{1}{\sqrt{2}} \left(\fr
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Going back to the original least squares derivation, we were minimizing
 $$ -\ln \mathcal{L} = -\sum_i \ln P_i $$
-For the negative terms, we have
+For the upper limit terms, we have
 $$ -\ln P_i = -\ln\left[ \mathrm{erfc} \left(\frac{1}{\sqrt{2}} \left(\frac{\bar{\psi}_i}{\Sigma_i} - 1 \right) \right) \right] + \ln 2 $$
 and again the $\ln 2$ term does not depend on the model parameters so it is irrelevant to the fitting.</p>
 <p>Note that when we derived least squares fitting, we dropped a factor of 2 at the end because all terms in the sum had the same constant. These new terms do not have that factor of 2, so we need to reintroduce it either back into the least squares terms, or compensate for it here. We prefer the latter approach so as to leave the least squares terms unchanged from their usual values.</p>
 <h2 id="Final-procedure">Final procedure<a class="anchor-link" href="#Final-procedure">&#182;</a></h2><p>The final procedure is then to minimize the following with respect to the model parameters:</p>
-$$ \sum_{i\textrm{ where }\psi_i&gt;0} \frac{(y_i - \bar{y}_i)^2}{\sigma_i^2} - \sum_{i\textrm{ where }\psi_i \le 0} 2 \ln\left[ \mathrm{erfc} \left(\frac{1}{\sqrt{2}} \left(\frac{\bar{\psi}_i}{\Sigma_i} - 1 \right) \right) \right] $$<p>where $\{\psi_i\}$, $\{\Sigma_i\}$ are the raw (linear, background-subtracted) values and their uncertainties, and $ \{y_i = \log_{10}(\psi_i)\} $, 
-$ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
+$$ \sum_{i\textrm{ where }\psi_i&gt;0} \frac{(y_i - \bar{y}_i)^2}{\sigma_i^2} - \sum_{i\textrm{ where }\psi_i \le 0} 2 \ln\left[ \mathrm{erfc} \left(\frac{1}{\sqrt{2}} \left(\frac{\bar{\psi}_i}{\Sigma_i} - 1 \right) \right) \right] $$<p>where $\{\psi_i\}$, $\{\Sigma_i\}$ are the raw (linear, background-subtracted) values and their uncertainties, $ \{y_i = \log_{10}(\psi_i)\} $, 
+$ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values, and $\bar{\psi}_i$ and $\bar{y}_i$ are the model predictions for $\psi_i$ and $y_i$ respectively.</p>
 
 </div>
 </div>
@@ -14942,7 +14942,7 @@ $ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7fdcf22c90a0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f9620495e20&gt;</pre>
 </div>
 
 </div>
@@ -15022,7 +15022,7 @@ jp-needs-light-background
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7fdcf28ffb80&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f96208c6940&gt;</pre>
 </div>
 
 </div>
@@ -15070,8 +15070,8 @@ jp-needs-light-background
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Alternative-procedure:-log-when-possible,-linear-when-negative">Alternative procedure: log when possible, linear when negative<a class="anchor-link" href="#Alternative-procedure:-log-when-possible,-linear-when-negative">&#182;</a></h2><p>The upper limit term is a little long to calculate and definitely more painful to treat analytically if that's useful, so another approach might be to use the log fit wherever it's not negative, and do a linear term instead of the upper limit term when it's negative. As we'll see below, this relatively simple modification actually performs great. Formally, it still looks like very much like least squares; we minimize</p>
-$$ \sum_{i\textrm{ where }\psi_i&gt;0} \frac{(y_i - \bar{y}_i)^2}{\sigma_i^2} + \sum_{i\textrm{ where }\psi_i \le 0} \frac{(\psi_i - \bar{\psi}_i)^2}{\Sigma_i^2} $$<p>where again $\{\psi_i\}$, $\{\Sigma_i\}$ are the raw (linear, background-subtracted) values and their uncertainties, and $ \{y_i = \log_{10}(\psi_i)\} $, 
-$ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
+$$ \sum_{i\textrm{ where }\psi_i&gt;0} \frac{(y_i - \bar{y}_i)^2}{\sigma_i^2} + \sum_{i\textrm{ where }\psi_i \le 0} \frac{(\psi_i - \bar{\psi}_i)^2}{\Sigma_i^2} $$<p>with respect to the model parameters, where again $\{\psi_i\}$, $\{\Sigma_i\}$ are the raw (linear, background-subtracted) values and their uncertainties, $ \{y_i = \log_{10}(\psi_i)\} $, 
+$ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values, and $\bar{\psi}_i$ and $\bar{y}_i$ are the model predictions for $\psi_i$ and $y_i$ respectively.</p>
 
 </div>
 </div>
@@ -15087,7 +15087,7 @@ $ \{\sigma_i = \Sigma_i / \psi_i \ln(10)\}$ are the log-transformed values.</p>
 $$ f(R) = \begin{cases}
   A \exp(- R / a) &amp; R \le R_0 \\
   A \exp[-R_0/a - (R-R_0)/b] &amp; R &gt; R_0\\
-\end{cases}$$<p>with three 4 free parameters: the inner and outer scale lengths $a$ and $b$, the break radius $R_0$, and the amplitude $A$. On a log-linear scale, this is a typical situation:</p>
+\end{cases}$$<p>with 4 free parameters: the inner and outer scale lengths $a$ and $b$, the break radius $R_0$, and the amplitude $A$. On a log-linear scale, this is a typical situation:</p>
 
 </div>
 </div>
@@ -15342,8 +15342,8 @@ jp-needs-light-background
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">guess</span> <span class="o">=</span> <span class="n">trueparms</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">trueparms</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">guess</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;True:&#39;</span><span class="p">,</span> <span class="n">trueparms</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Initial guess:&#39;</span><span class="p">,</span><span class="n">guess</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15365,8 +15365,8 @@ jp-needs-light-background
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[1.  0.7 2.  2. ]
-[1.61546404 0.424907   3.46928202 2.52854047]
+<pre>True: [1.  0.7 2.  2. ]
+Initial guess: [1.61546404 0.424907   3.46928202 2.52854047]
 </pre>
 </div>
 </div>
@@ -15590,7 +15590,7 @@ Fit: [0.96530206 0.6848794  1.75130682 1.81916897]
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/var/folders/qw/j92fvdd10wd917z4qrt9fwp40000gn/T/ipykernel_86019/2062580544.py:1: RuntimeWarning: invalid value encountered in log10
+<pre>/var/folders/qw/j92fvdd10wd917z4qrt9fwp40000gn/T/ipykernel_87346/2062580544.py:1: RuntimeWarning: invalid value encountered in log10
   valuedata_log = np.log10(valuedata)
 </pre>
 </div>
@@ -16249,7 +16249,7 @@ Fit: [1.06377106 0.69960087 1.99338384 1.90490044]
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.legend.Legend at 0x7fdcf32fddf0&gt;</pre>
+<pre>&lt;matplotlib.legend.Legend at 0x7f96211b9880&gt;</pre>
 </div>
 
 </div>
